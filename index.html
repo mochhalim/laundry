@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B7F95">
+<meta name="description" content="Kasir dan pencatatan pesanan laundry. Berjalan di browser, data tersimpan di perangkat Anda.">
+<title>Sistem Laundry</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/style.css">
+<style id="pageStyle"></style>
+</head>
+<body>
+
+<!-- Layar masuk / buat akun pertama -->
+<div id="lock" hidden>
+  <form id="fLock" autocomplete="on">
+    <h2 id="lockNama">Laundry</h2>
+    <p class="mut">Masuk untuk melanjutkan.</p>
+    <label>Nama pengguna<input id="uIn" autocomplete="username" autocapitalize="none" required></label>
+    <label>Kata sandi<input id="pwIn" type="password" autocomplete="current-password" required></label>
+    <button class="utama">Masuk</button>
+    <p id="lockMsg" class="galat" role="alert"></p>
+    <button type="button" id="lupa" class="link">Lupa kata sandi?</button>
+  </form>
+  <form id="fSetup" autocomplete="off" hidden>
+    <h2>Selamat datang</h2>
+    <p class="mut">Buat akun pemilik untuk pertama kali. Akun ini punya akses penuh.</p>
+    <label>Nama lengkap<input id="sNama" required maxlength="40"></label>
+    <label>Nama pengguna<input id="sUser" required maxlength="20" autocapitalize="none" placeholder="contoh: ibu.rina"></label>
+    <label>Kata sandi (minimal 6 karakter)<input id="sPw" type="password" minlength="6" autocomplete="new-password" required></label>
+    <label>Ulangi kata sandi<input id="sPw2" type="password" minlength="6" autocomplete="new-password" required></label>
+    <button class="utama">Buat akun dan masuk</button>
+    <p id="setupMsg" class="galat" role="alert"></p>
+  </form>
+</div>
+
+<!-- Halaman untuk pelanggan (dibuka dari tautan di WhatsApp) -->
+<div id="pelanggan" hidden></div>
+
+<div id="app">
+  <header class="top">
+    <div class="top-in">
+      <h1 id="namaToko">Laundry</h1>
+      <div class="userbox"><span id="userInfo" class="mut"></span><button id="keluar" class="ikon" hidden>Keluar</button></div>
+    </div>
+    <nav id="tabs" aria-label="Menu utama">
+      <button data-tab="beranda" class="on">Beranda</button>
+      <button data-tab="kasir">Kasir</button>
+      <button data-tab="daftar">Pesanan</button>
+      <button data-tab="laporan">Laporan</button>
+      <button data-tab="setelan">Setelan</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- BERANDA -->
+    <section id="beranda" class="tab on">
+      <div id="banner"></div>
+      <div class="stat" id="stat"></div>
+      <h2>Perlu diperhatikan</h2>
+      <div id="perhatian"></div>
+      <h2>Daftar layanan dan harga</h2>
+      <div id="harga" class="harga"></div>
+    </section>
+
+    <!-- KASIR -->
+    <section id="kasir" class="tab">
+      <h2 id="judulKasir">Catat pesanan baru</h2>
+      <form id="formBaru" class="form" autocomplete="off">
+        <label>Nama pelanggan
+          <input id="nama" list="dlPelanggan" required maxlength="60">
+          <datalist id="dlPelanggan"></datalist>
+        </label>
+        <label>Nomor WhatsApp
+          <input id="hp" inputmode="tel" placeholder="08123456789" maxlength="20">
+        </label>
+
+        <fieldset class="lebar">
+          <legend>Layanan</legend>
+          <div id="items"></div>
+          <button type="button" id="tambahItem">+ Tambah layanan</button>
+        </fieldset>
+
+        <label>Tanggal masuk<input id="masuk" type="date" required></label>
+        <label>Estimasi selesai<input id="selesai" type="date" required></label>
+        <label class="lebar">Catatan<input id="catatan" maxlength="200" placeholder="Contoh: pisahkan baju putih"></label>
+
+        <label>Diskon (Rp)<input id="diskon" type="number" inputmode="numeric" min="0" step="500" placeholder="0"></label>
+        <div id="dpWrap" class="dp">
+          <label>Bayar di muka (Rp)<input id="dp" type="number" inputmode="numeric" min="0" step="500" placeholder="0"></label>
+          <label>Metode<select id="metode"></select></label>
+        </div>
+
+        <div class="ringkas lebar" id="ringkas" aria-live="polite"></div>
+        <div class="lebar aksi">
+          <button class="utama" id="simpan">Simpan pesanan</button>
+          <button type="button" id="batalEdit" hidden>Batal ubah</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- DAFTAR -->
+    <section id="daftar" class="tab">
+      <h2>Daftar pesanan</h2>
+      <div class="aksi">
+        <input id="cari" type="search" placeholder="Cari nama, kode, atau nomor" aria-label="Cari pesanan">
+        <select id="filter" aria-label="Filter"></select>
+      </div>
+      <p id="jumlahHasil" class="mut"></p>
+      <div id="list"></div>
+    </section>
+
+    <!-- LAPORAN -->
+    <section id="laporan" class="tab">
+      <h2>Laporan bulanan</h2>
+      <div class="aksi">
+        <label class="inline">Bulan <input id="bulan" type="month"></label>
+        <button id="csv">Unduh CSV</button>
+        <button id="cetakLap">Cetak</button>
+      </div>
+      <div id="isiLaporan"></div>
+    </section>
+
+    <!-- SETELAN -->
+    <section id="setelan" class="tab">
+      <h2>Akun dan pengguna</h2>
+      <div class="kartu-putih" id="boxAkun"></div>
+      <div class="owner-only">
+      <h2>Data toko</h2>
+      <form id="formToko" class="form" autocomplete="off">
+        <label>Nama toko<input id="tNama" required maxlength="50"></label>
+        <label>Nomor HP/WhatsApp toko<input id="tHp" inputmode="tel" maxlength="20"></label>
+        <label class="lebar">Alamat<input id="tAlamat" maxlength="120"></label>
+        <label>Awalan kode nota<input id="tPrefix" maxlength="5" pattern="[A-Za-z0-9]{2,5}" title="2 sampai 5 huruf atau angka"></label>
+        <label>Lebar kertas printer nota
+          <select id="tKertas"><option value="58">58 mm (kecil)</option><option value="80">80 mm (besar)</option></select>
+        </label>
+        <label class="lebar">Teks bawah nota<input id="tFooter" maxlength="120"></label>
+        <button class="utama lebar">Simpan data toko</button>
+      </form>
+
+      <h2>Layanan dan harga</h2>
+      <div class="kartu-putih">
+        <div class="svc svc-h" aria-hidden="true"><span>Nama layanan</span><span>Satuan</span><span>Harga (Rp)</span><span>Hari</span><span></span></div>
+        <div id="svcRows"></div>
+        <div class="aksi">
+          <button id="svcTambah" type="button">+ Tambah layanan</button>
+          <button id="svcSimpan" type="button" class="utama">Simpan layanan</button>
+          <button id="svcReset" type="button" class="bahaya">Kembalikan ke bawaan</button>
+        </div>
+        <p class="mut">Mengubah harga tidak mengubah pesanan yang sudah tercatat.</p>
+      </div>
+
+      <h2>Data dan cadangan</h2>
+      <div class="kartu-putih">
+        <p class="mut" id="infoData"></p>
+        <div class="aksi">
+          <button id="ekspor">Unduh cadangan (JSON)</button>
+          <label class="btn">Pulihkan dari file<input type="file" id="impor" accept=".json,application/json" hidden></label>
+          <button id="hapusSemua" class="bahaya">Hapus semua data</button>
+        </div>
+      </div>
+
+      </div>
+      <h2>Tentang</h2>
+      <p class="mut">Sistem Laundry versi 2.1. Data tersimpan hanya di browser perangkat ini dan tidak dikirim ke server mana pun.</p>
+    </section>
+  </main>
+</div>
+
+<dialog id="dlg"><div id="dlgBody"></div></dialog>
+<div id="nota"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="js/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "toko": {
+    "nama": "Laundry Bersih Kita",
+    "alamat": "Jl. Contoh No. 1, Mojokerto",
+    "hp": "08123456789",
+    "prefix": "LDR",
+    "footer": "Terima kasih. Simpan nota ini untuk mengambil cucian.",
+    "kertas": "58"
+  },
+  "layanan": [
+    { "id": "kiloan",     "nama": "Cuci setrika kiloan", "satuan": "kg",  "harga": 7000,  "hari": 3 },
+    { "id": "cuci-lipat", "nama": "Cuci lipat saja",     "satuan": "kg",  "harga": 5000,  "hari": 2 },
+    { "id": "setrika",    "nama": "Setrika saja",        "satuan": "kg",  "harga": 4000,  "hari": 2 },
+    { "id": "express",    "nama": "Express 1 hari",      "satuan": "kg",  "harga": 12000, "hari": 1 },
+    { "id": "bedcover",   "nama": "Selimut / bed cover", "satuan": "pcs", "harga": 25000, "hari": 4 },
+    { "id": "jas",        "nama": "Jas / jaket",         "satuan": "pcs", "harga": 20000, "hari": 3 }
+  ]
+}
